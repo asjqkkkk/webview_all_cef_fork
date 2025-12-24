@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Adds the line
-# '#include <webview_cef/webview_cef_plugin.h>'
+# '#include <webview_all_cef/webview_cef_plugin.h>'
 # after the line
 # '#include "flutter/generated_plugin_registrant.h"'
-# if '#include <webview_cef/webview_cef_plugin.h>' is missing
+# if '#include <webview_all_cef/webview_cef_plugin.h>' is missing
 
 # Check if the correct number of arguments is passed
 if [ $# -ne 1 ]; then
@@ -22,8 +22,8 @@ if [ ! -f "$file" ]; then
 fi
 
 # Check if the line already exists in the file
-if grep -q '#include <webview_cef/webview_cef_plugin.h>' "$file"; then
-  echo "The line '#include <webview_cef/webview_cef_plugin.h>' already exists in the file."
+if grep -q '#include <webview_all_cef/webview_cef_plugin.h>' "$file"; then
+  echo "The line '#include <webview_all_cef/webview_cef_plugin.h>' already exists in the file."
   exit 0
 fi
 
@@ -31,10 +31,10 @@ fi
 awk '
   /#include "flutter\/generated_plugin_registrant.h"/ {
     print;
-    print "#include <webview_cef/webview_cef_plugin.h>"
+    print "#include <webview_all_cef/webview_cef_plugin.h>"
     next
   }
   { print }
 ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
 
-echo "Added '#include <webview_cef/webview_cef_plugin.h>' after '#include \"flutter/generated_plugin_registrant.h\"'"
+echo "Added '#include <webview_all_cef/webview_cef_plugin.h>' after '#include \"flutter/generated_plugin_registrant.h\"'"

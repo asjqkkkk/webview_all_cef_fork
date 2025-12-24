@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.10)
 cmake_policy(SET CMP0074 NEW)
 
 # Project-level configuration.
-set(PROJECT_NAME "webview_cef")
+set(PROJECT_NAME "webview_all_cef")
 project(${PROJECT_NAME} LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -28,7 +28,7 @@ find_package(CEF REQUIRED)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed.
-set(PLUGIN_NAME "webview_cef_plugin")
+set(PLUGIN_NAME "webview_all_cef_plugin")
 
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
@@ -138,7 +138,7 @@ endforeach(FILE)
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
-set(webview_cef_bundled_libraries
+set(webview_all_cef_bundled_libraries
   ""
   ${cef_library_list}
   PARENT_SCOPE

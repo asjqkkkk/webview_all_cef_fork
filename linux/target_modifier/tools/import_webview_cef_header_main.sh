@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Adds '#include <webview_cef/webview_cef_plugin.h>' at the top of the file
+# Adds '#include <webview_all_cef/webview_cef_plugin.h>' at the top of the file
 
 # Check if the correct number of arguments is passed
 if [ $# -ne 1 ]; then
@@ -18,10 +18,10 @@ if [ ! -f "$file" ]; then
 fi
 
 # Check if the line already exists in the file
-if grep -q '#include <webview_cef/webview_cef_plugin.h>' "$file"; then
-  echo "The line '#include <webview_cef/webview_cef_plugin.h>' already exists in the file."
+if grep -q '#include <webview_all_cef/webview_cef_plugin.h>' "$file"; then
+  echo "The line '#include <webview_all_cef/webview_cef_plugin.h>' already exists in the file."
 else
   # Add the line at the top of the file
-  (echo "#include <webview_cef/webview_cef_plugin.h>"; cat "$file") > "$file.tmp" && mv "$file.tmp" "$file"
-  echo "Added '#include <webview_cef/webview_cef_plugin.h>' at the top of the file."
+  (echo "#include <webview_all_cef/webview_cef_plugin.h>"; cat "$file") > "$file.tmp" && mv "$file.tmp" "$file"
+  echo "Added '#include <webview_all_cef/webview_cef_plugin.h>' at the top of the file."
 fi
