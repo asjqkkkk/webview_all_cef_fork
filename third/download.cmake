@@ -17,6 +17,14 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 set(cef_prebuilt_version_path "https://github.com/hlwhl/webview_cef/releases/download/prebuilt_cef_bin_linux/version.txt")
 
+if(NOT DEFINED WEBVIEW_CEF_STRIP_TOOL)
+    if(CMAKE_STRIP)
+        set(WEBVIEW_CEF_STRIP_TOOL ${CMAKE_STRIP})
+    else()
+        find_program(WEBVIEW_CEF_STRIP_TOOL strip)
+    endif()
+endif()
+
 
 function(extract_file filename extract_dir)
     message(WARNING "${filename} will extract to ${extract_dir} ...")
@@ -46,6 +54,53 @@ function(download_file url filename)
     message(WARNING "Downloading ${filename} from ${url}")
     file(DOWNLOAD ${url} ${filename} STATUS SHOW_PROGRESS)
 endfunction(download_file)
+
+function(strip_cef_binary filepath)
+    if(NOT EXISTS ${filepath})
+        return()
+    endif()
+    if(NOT WEBVIEW_CEF_STRIP_TOOL)
+        message(WARNING "No strip tool available, skip stripping ${filepath}")
+        return()
+    endif()
+    execute_process(
+        COMMAND ${WEBVIEW_CEF_STRIP_TOOL} --strip-unneeded ${filepath}
+        RESULT_VARIABLE strip_result
+        ERROR_VARIABLE strip_error
+    )
+    if(NOT strip_result EQUAL 0)
+        message(WARNING "Failed to strip ${filepath}: ${strip_error}")
+    endif()
+endfunction()
+
+function(trim_cef_runtime root_dir)
+    set(extra_dirs
+        "${root_dir}/tests"
+        "${root_dir}/tools"
+        "${root_dir}/libcef_dll/Debug"
+        "${root_dir}/libcef_dll_wrapper/Debug"
+        "${root_dir}/samples"
+    )
+    foreach(dir_path ${extra_dirs})
+        if(EXISTS ${dir_path})
+            file(REMOVE_RECURSE ${dir_path})
+        endif()
+    endforeach()
+
+    set(strip_targets
+        "${root_dir}/Release/libcef.so"
+        "${root_dir}/Release/libEGL.so"
+        "${root_dir}/Release/libGLESv2.so"
+        "${root_dir}/Release/libvk_swiftshader.so"
+        "${root_dir}/Release/chrome-sandbox"
+        "${root_dir}/Release/swiftshader/libEGL.so"
+        "${root_dir}/Release/swiftshader/libGLESv2.so"
+        "${root_dir}/Release/swiftshader/libvk_swiftshader.so"
+    )
+    foreach(target_file ${strip_targets})
+        strip_cef_binary(${target_file})
+    endforeach()
+endfunction()
 
 function(prepare_prebuilt_files filepath)
     set(need_download FALSE)
@@ -79,6 +134,7 @@ function(prepare_prebuilt_files filepath)
         download_file(${cef_prebuilt_path} ${CMAKE_CURRENT_SOURCE_DIR}/prebuilt.zip)
         file(MAKE_DIRECTORY ${filepath})
         extract_file(${CMAKE_CURRENT_SOURCE_DIR}/prebuilt.zip ${filepath})
+        trim_cef_runtime(${filepath})
 
         ## Needed for making it run on arm64 Linux (makes it check for arm64 or aarch64 instead of just arm64)
         if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
